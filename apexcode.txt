@@ -152,4 +152,18 @@ This example shows how to delete all contacts whose last name is Smith. If youâ€
 Contact[] contactsDel = [SELECT Id FROM Contact WHERE LastName='Smith']; 
 delete contactsDel;
 
+## DML Statement Exceptions
+If a DML operation fails, it returns an exception of type DmlException. You can catch exceptions in your code to handle error conditions.
 
+This example produces a DmlException because it attempts to insert an account without the required Name field. The exception is caught in the catch block.
+
+try {
+    // This causes an exception because 
+    //   the required Name field is not provided.
+    Account acct = new Account();
+    // Insert the account 
+    insert acct;
+} catch (DmlException e) {
+    System.debug('A DML exception has occurred: ' +
+                e.getMessage());
+}
