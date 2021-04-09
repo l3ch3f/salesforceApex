@@ -1,0 +1,81 @@
+Apex contains the built-in Database class, which provides methods that perform DML operations and mirror the DML statement counterparts.
+These Database methods are static and are called on the class name.
+
+Database.insert()
+Database.update()
+Database.upsert()
+Database.delete()
+Database.undelete()
+Database.merge()
+Unlike DML statements, Database methods have an optional allOrNone parameter that allows you to specify whether the operation should partially succeed. When this parameter is set to false, if errors occur on a partial set of records, the successful records will be committed and errors will be returned for the failed records. Also, no exceptions are thrown with the partial success option.
+
+This is how you call the insert method with the allOrNone set to false.
+
+Database.insert(recordList, false);
+The Database methods return result objects containing success or failure information for each record. For example, insert and update operations each return an array of Database.SaveResult objects.
+
+Database.SaveResult[] results = Database.insert(recordList, false);
+
+## Example: Inserting Records with Partial Success
+Let’s take a look at an example that uses the Database methods. This example is based on the bulk DML example, but replaces the DML statement with a Database method. The Database.insert() method is called with the partial success option. One contact in the list doesn’t have any fields on purpose and will cause an error because the contact can’t be saved without the required LastName field. Three contacts are committed and the contact without any fields generates an error. The last part of this example iterates through the returned results and writes debug messages to the debug log.
+
+// Create a list of contacts
+List<Contact> conList = new List<Contact> {
+        new Contact(FirstName='Joe',LastName='Smith',Department='Finance'),
+        new Contact(FirstName='Kathy',LastName='Smith',Department='Technology'),
+        new Contact(FirstName='Caroline',LastName='Roth',Department='Finance'),
+        new Contact()};
+            
+// Bulk insert all contacts with one DML call
+Database.SaveResult[] srList = Database.insert(conList, false);
+// Iterate through each returned result
+for (Database.SaveResult sr : srList) {
+    if (sr.isSuccess()) {
+        // Operation was successful, so get the ID of the record that was processed
+        System.debug('Successfully inserted contact. Contact ID: ' + sr.getId());
+    } else {
+        // Operation failed, so get all errors
+        for(Database.Error err : sr.getErrors()) {
+            System.debug('The following error has occurred.');
+            System.debug(err.getStatusCode() + ': ' + err.getMessage());
+            System.debug('Contact fields that affected this error: ' + err.getFields());
+	 }
+    }
+}
+
+## you can insert records related to existing records if a relationship has already been defined between the two objects, such as a lookup or master-detail relationship. A record is associated with a related record through a foreign key ID. For example, if inserting a new contact, you can specify the contact's related account record by setting the value of the AccountId field.
+
+This example shows how to add a contact to an account (the related record) by setting the AccountId field on the contact. Contact and Account are linked through a lookup relationship.
+
+Account acct = new Account(Name='SFDC Account');
+insert acct;
+// Once the account is inserted, the sObject will be 
+// populated with an ID.
+// Get this ID.
+ID acctID = acct.ID;
+// Add a contact to this account.
+Contact mario = new Contact(
+    FirstName='Mario',
+    LastName='Ruiz',
+    Phone='415.555.1212',
+    AccountId=acctID);
+insert mario;
+
+
+## Updating Related Records
+Fields on related records can't be updated with the same call to the DML operation and require a separate DML call. For example, if inserting a new contact, you can specify the contact's related account record by setting the value of the AccountId field. However, you can't change the account's name without updating the account itself with a separate DML call. Similarly, when updating a contact, if you also want to update the contact’s related account, you must make two DML calls. The following example updates a contact and its related account using two update statements.
+// Query for the contact, which has been associated with an account.
+Contact queriedContact = [SELECT Account.Name 
+                          FROM Contact 
+                          WHERE FirstName = 'Mario' AND LastName='Ruiz'
+                          LIMIT 1];
+// Update the contact's phone number
+queriedContact.Phone = '(415)555-1213';
+// Update the related account industry
+queriedContact.Account.Industry = 'Technology';
+// Make two separate calls 
+// 1. This call is to update the contact's phone.
+update queriedContact;
+// 2. This call is to update the related account's Industry field.
+update queriedContact.Account; 
+
