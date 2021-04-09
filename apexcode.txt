@@ -44,3 +44,6 @@ public class EmailManager {
 EmailManager em = new EmailManager();
 em.sendMail('Your email address', 'Trailhead Tutorial', '123 body');
 
+
+
+Debug logs are useful for debugging your code. When Apex methods execute, the calls are logged in the debug log. Also, you can write your own debug messages to the log, which helps in debugging your code in case there are errors. The inspectResults() helper method, which is called by sendMail(), writes messages to the log by using the System.debug() method to indicate whether the email send operation was successful or had errors. You can look for these messages in the debug log that was generated when you executed the method.
