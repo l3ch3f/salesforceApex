@@ -47,3 +47,24 @@ em.sendMail('Your email address', 'Trailhead Tutorial', '123 body');
 
 
 Debug logs are useful for debugging your code. When Apex methods execute, the calls are logged in the debug log. Also, you can write your own debug messages to the log, which helps in debugging your code in case there are errors. The inspectResults() helper method, which is called by sendMail(), writes messages to the log by using the System.debug() method to indicate whether the email send operation was successful or had errors. You can look for these messages in the debug log that was generated when you executed the method.
+
+
+The following example creates an sObject variable of type Account and assigns it to a new account with the name Acme.:
+Account acct = new Account(Name='Acme');
+
+
+// Create the account sObject 
+Account acct = new Account(Name='Acme', Phone='(415)555-1212', NumberOfEmployees=100);
+// Insert the account by using DML
+insert acct;
+
+DML Statements
+The following DML statements are available.
+
+insert
+update
+upsert
+delete
+undelete
+merge
+
