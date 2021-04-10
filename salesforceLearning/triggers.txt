@@ -40,3 +40,41 @@ trigger CalloutTrigger on Account (before insert, before update) {
     CalloutClass.makeCallout();
 }
 
+
+## Beyond the Basics
+Triggers execute on batches of 200 records at a time. So if 400 records cause a trigger to fire, the trigger fires twice, once for each 200 records. For this reason, you don’t get the benefit of SOQL for loop record batching in triggers, because triggers batch up records as well. The SOQL for loop is called twice in this example, but a standalone SOQL query would also be called twice. However, the SOQL for loop still looks more elegant than iterating over a collection variable!
+
+## When performing DML calls in a trigger or in a class, perform DML calls on a collection of sObjects when possible. Performing DML on each sObject individually uses resources inefficiently. The Apex runtime allows up to 150 DML calls in one transaction.
+
+This trigger performs an update call inside a for loop that iterates over related opportunities. If certain conditions are met, the trigger updates the opportunity description. In this example, the update statement is inefficiently called once for each opportunity. If a bulk account update operation fired the trigger, there can be many accounts. If each account has one or two opportunities, we can easily end up with over 150 opportunities. The DML statement limit is 150 calls.
+
+trigger DmlTriggerNotBulk on Account(after update) {   
+    // Get the related opportunities for the accounts in this trigger.        
+    List<Opportunity> relatedOpps = [SELECT Id,Name,Probability FROM Opportunity
+        WHERE AccountId IN :Trigger.New];          
+    // Iterate over the related opportunities
+    for(Opportunity opp : relatedOpps) {      
+        // Update the description when probability is greater 
+        // than 50% but less than 100% 
+        if ((opp.Probability >= 50) && (opp.Probability < 100)) {
+            opp.Description = 'New description for opportunity.';
+            // Update once for each opportunity -- not efficient!
+            update opp;
+        }
+    }    
+}
+
+## Bulk Design Pattern in Action: Trigger Example for Getting Related Records
+Let’s apply the design patterns you’ve learned by writing a trigger that accesses accounts’ related opportunities. Modify the trigger example from the previous unit for the AddRelatedRecord trigger. The AddRelatedRecord trigger operates in bulk, but is not as efficient as it could be because it iterates over all Trigger.New sObject records. This next example modifies the SOQL query to get only the records of interest and then iterate over those records. If you haven’t created this trigger, don’t worry—you can create it in this section.
+
+Let’s start with the requirements for the AddRelatedRecord trigger. The trigger fires after accounts are inserted or updated. The trigger adds a default opportunity for every account that doesn’t already have an opportunity. The first problem to tackle is to figure out how to get the child opportunity records. Because this trigger is an after trigger, we can query the affected records from the database. They’ve already been committed by the time the after trigger is fired. Let’s write a SOQL query that returns all accounts in this trigger that don’t have related opportunities.
+
+[SELECT Id,Name FROM Account WHERE Id IN :Trigger.New AND
+                                             Id NOT IN (SELECT AccountId FROM Opportunity)]
+Now that we got the subset of records we’re interested in, let’s iterate over those records by using a SOQL for loop, as follows.
+
+for(Account a : [SELECT Id,Name FROM Account WHERE Id IN :Trigger.New AND
+                                         Id NOT IN (SELECT AccountId FROM Opportunity)]){
+}
+
+
