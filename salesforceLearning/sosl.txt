@@ -1,0 +1,32 @@
+## Insert dummy data
+
+// Add account and related contact
+Account acct = new Account(
+    Name='Smith Computing',
+    Phone='(415)555-1212',
+    NumberOfEmployees=50,
+    BillingCity='San Francisco');
+insert acct;
+
+// Once the account is inserted, the sObject will be 
+// populated with an ID.
+// Get this ID.
+ID acctID = acct.ID;
+
+// Add a contact to this account.
+Contact con = new Contact(
+    FirstName='Carol',
+    LastName='Smith',
+    Phone='(415)555-1212',
+    Department='Wingo',
+    AccountId=acctID);
+insert con;
+
+// Add account with no contact
+Lead newLead = new Lead(
+    FirstName='Tizen',
+    LastName='Smith',
+    Phone='(310)555-1213',
+	Company='IGATE',
+	LeadSource='Web');
+insert newLead;

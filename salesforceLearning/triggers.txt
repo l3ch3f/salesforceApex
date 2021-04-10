@@ -1,0 +1,42 @@
+## The syntax of a trigger definition is different from a class definition’s syntax. A trigger definition starts with the trigger keyword. It is then followed by the name of the trigger, the Salesforce object that the trigger is associated with, and the conditions under which it fires. A trigger has the following syntax:
+trigger TriggerName on ObjectName (trigger_events) {
+   code_block
+}
+
+To execute a trigger before or after insert, update, delete, and undelete operations, specify multiple trigger events in a comma-separated list. The events you can specify are:
+before insert
+before update
+before delete
+after insert
+after update
+after delete
+after undelete
+
+## There are two types of triggers.
+
+Before triggers are used to update or validate record values before they’re saved to the database.
+After triggers are used to access field values that are set by the system (such as a record's Id or LastModifiedDate field), and to affect changes in other records. The records that fire the after trigger are read-only.
+
+## Triggers and Callouts
+Apex allows you to make calls to and integrate your Apex code with external Web services. Apex calls to external Web services are referred to as callouts. For example, you can make a callout to a stock quote service to get the latest quotes. When making a callout from a trigger, the callout must be done asynchronously so that the trigger process doesn’t block you from working while waiting for the external service's response.The asynchronous callout is made in a background process, and the response is received when the external service returns it.
+
+To make a callout from a trigger, call a class method that executes asynchronously. Such a method is called a future method and is annotated with @future(callout=true). This example class contains the future method that makes the callout.
+
+public class CalloutClass {
+    @future(callout=true)
+    public static void makeCallout() {
+        HttpRequest request = new HttpRequest();
+        // Set the endpoint URL.
+        String endpoint = 'http://yourHost/yourService';
+        request.setEndPoint(endpoint);
+        // Set the HTTP verb to GET.
+        request.setMethod('GET');
+        // Send the HTTP request and get the response.
+        HttpResponse response = new HTTP().send(request);
+    }
+}
+
+trigger CalloutTrigger on Account (before insert, before update) {
+    CalloutClass.makeCallout();
+}
+
