@@ -21,7 +21,7 @@ clickCreateItem : function(component, event, helper) {
     //     var newCampingItem = component.get("v.newItem");
     //     //helper.createCamping(component,newCampingItem);
     //     var campings = component.get("v.items");
-    //     var item = JSON.parse(JSON.stringify(newCampingItem));
+    //     var item = JSON.parse(JSON.stri ngify(newCampingItem));
          
     //     campings.push(item);
          
