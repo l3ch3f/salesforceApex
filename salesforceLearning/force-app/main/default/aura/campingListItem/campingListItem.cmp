@@ -9,9 +9,8 @@
       <p>Quantity:
         <lightning:formattedNumber value="{!v.item.Quantity__c}" style="number" />
       </p>
-      
-      
       <p>
         <lightning:input type="toggle" label="Packed?" name="Packed" checked="{!v.item.Packed__c}" />
       </p>
+      <lightning:button label="Packed!" onclick="{!c.packItem}" />
 </aura:component>	
