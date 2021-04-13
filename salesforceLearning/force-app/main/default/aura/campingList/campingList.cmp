@@ -1,5 +1,7 @@
-<aura:component>
+<aura:component controller="CampingListController">
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
   <aura:attribute name="items" type="Camping_Item__c[]" />
+  <aura:attribute name="er" type="boolean" default="false" />
   <aura:attribute name="newItem" type="Camping_Item__c" default="{'Name':'',
 'Quantity__c':0,
 'Price__c':0,
@@ -11,19 +13,16 @@
 
 
     <c:campingHeader />
-    <div aria-labelledby="newCampaingForm">
+    <div aria-labelledby="newCampingForm">
 
       <!-- BOXED AREA -->
       <fieldset class="slds-box slds-theme--default slds-container--small">
-
         <legend id="newCampaingForm" class="slds-text-heading--small
 slds-p-vertical--medium">
           Add Expense
         </legend>
-
         <!-- CREATE NEW Campaing FORM -->
         <form class="slds-form--stacked">
-
           <!-- For Name Field -->
           <lightning:input aura:id="expenseform" label="Camping Name" name="expensename" value="{!v.newItem.Name}"
             required="true" />
@@ -36,7 +35,6 @@ slds-p-vertical--medium">
           <!-- For Check Box -->
           <lightning:input type="checkbox" aura:id="campingform" label="Packed" name="expreimbursed"
             checked="{!v.newItem.Packed__c}" />
-
           <lightning:button label="Create Camping" class="slds-m-top--medium" variant="brand"
             onclick="{!c.clickCreateItem}" />
         </form>
