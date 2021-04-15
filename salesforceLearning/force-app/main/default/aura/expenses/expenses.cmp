@@ -12,9 +12,9 @@
       <lightning:icon iconName="standard:scan_card" alternativeText="My Expenses" />
     </lightning:layoutItem>
     <lightning:layoutItem padding="horizontal-small">
-      <div class="page-section page-header">
-        <h1 class="slds-text-heading_label">Expenses</h1>
-        <h2 class="slds-text-heading_medium">My Expenses</h2>
+      <div class="page-section page-header title">
+        <h1 class="slds-text-heading_label title__h1">Expenses</h1>
+        <h2 class="slds-text-heading_medium title__h2">My Expenses</h2>
       </div>
     </lightning:layoutItem>
   </lightning:layout>
